@@ -1,0 +1,71 @@
+.app-container {
+  font-family: sans-serif;
+  padding: 2rem;
+  background-color: #f0f8ff;
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #004080;
+}
+
+.grid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+
+.card h2 {
+  margin-bottom: 1rem;
+  color: #003366;
+}
+
+.card p {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+button {
+  background-color: #007acc;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+.result {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.result.good {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.result.poor {
+  background-color: #f8d7da;
+  color: #721c24;
+}
