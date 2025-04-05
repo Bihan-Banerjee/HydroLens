@@ -190,7 +190,7 @@ function App() {
         <div className="card">
           <h2>Prediction</h2>
           <p>Click to simulate a prediction using the latest water sensor data.</p>
-          <button onClick={() => alert("Hooked up to AI logic earlier")}>Predict Water Quality</button>
+          <button className="predict-button" onClick={() => alert("Hooked up to AI logic earlier")}>Predict Water Quality</button>
         </div>
       </div>
     </div>
