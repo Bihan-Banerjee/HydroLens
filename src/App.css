@@ -10,6 +10,14 @@
   transition: all 0.3s ease;
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 .upload-container:hover {
   transform: scale(1.02);
   box-shadow: 0px 16px 25px rgba(0, 0, 0, 0.2);
@@ -37,10 +45,9 @@
 }
 
 .custom-file-input:hover {
-  background-color: #005fa3;
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
-<<<<<<< HEAD
+  background: linear-gradient(45deg, #0072ff, #00c6ff);
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00e5ff, 0 0 5px #00e5ff;
 }
 
 .custom-file-input input[type="file"] {
@@ -57,7 +64,7 @@
   .app-container {
     font-family: sans-serif;
     padding: 2rem;
-    background-image: linear-gradient(to right, #e0f7fa, #b2ebf2, #80deea, #4dd0e1);
+    background-image: linear-gradient(45deg, #6b86e8, #3e68ff, #80deea, #2077e1);
     background-size: 200% 200%; 
     background-position: 0% 50%;
     animation: rotateBackground 10s linear infinite; 
@@ -84,12 +91,23 @@
     }
   }
   h1 {
+    color: #ffffff;
     text-align: center;
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    color: #004080;
+    font-size: 2.5rem;
+    text-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+    animation: flicker 1.5s infinite alternate;
   }
-
+  
+  @keyframes flicker {
+    0% {
+      opacity: 0.9;
+      text-shadow: 0 0 5px #00bcd4, 0 0 10px #00bcd4;
+    }
+    100% {
+      opacity: 1;
+      text-shadow: 0 0 20px #00e5ff, 0 0 30px #00e5ff;
+    }
+  }
   .grid {
     display: flex;
     gap: 2rem;
@@ -205,10 +223,7 @@
     transition: all 0.3s ease;
     scale:1.1;
   }
-=======
-  transition: all 0.3s ease;
-  scale:1.1;
-}
+
 
 .prediction-result {
   margin-top: 10px;
@@ -232,4 +247,3 @@
   text-align: center;
   transition: all 0.3s ease;
 }
->>>>>>> 5806928707a4e0be66a949069622ca8bc9165d00

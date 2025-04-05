@@ -12,32 +12,22 @@ import {
 } from "recharts";
 import "./App.css";
 
-
-
 function App() {
   const COLORS = ["#8884d8", "#82ca9d", "#ff7300"];
   const [chartType, setChartType] = useState("line");
   const [prediction, setPrediction] = useState("");
-
-const fallbackData = [
-  { time: "10:00", ph: 7.2, turbidity: 1.1, hardness: 0.5 },
-  { time: "10:10", ph: 6.9, turbidity: 1.5, hardness: 0.3 },
-  { time: "10:20", ph: 7.0, turbidity: 1.3, hardness: 0.4 },
-  { time: "10:30", ph: 7.3, turbidity: 1.0, hardness: 0.5 },
-  { time: "10:40", ph: 7.1, turbidity: 1.2, hardness: 0.9 },
-  { time: "10:50", ph: 6.8, turbidity: 1.6, hardness: 0.8 },
-  { time: "11:00", ph: 7.0, turbidity: 1.4, hardness: 0.7 },
-  { time: "11:10", ph: 7.4, turbidity: 1.0, hardness: 0.2 },
-  { time: "11:20", ph: 7.3, turbidity: 1.1, hardness: 0.1 },
-  { time: "11:30", ph: 7.1, turbidity: 1.2, hardness: 0.6 }
-];
-
-<<<<<<< HEAD
-function App() {
-  const [chartType, setChartType] = useState("line");
-  const [data, setData] = useState(fallbackData);
-=======
-
+  const [data, setData] = useState([
+    { time: "10:00", ph: 7.2, turbidity: 1.1, hardness: 0.5 },
+    { time: "10:10", ph: 6.9, turbidity: 1.5, hardness: 0.3 },
+    { time: "10:20", ph: 7.0, turbidity: 1.3, hardness: 0.4 },
+    { time: "10:30", ph: 7.3, turbidity: 1.0, hardness: 0.5 },
+    { time: "10:40", ph: 7.1, turbidity: 1.2, hardness: 0.9 },
+    { time: "10:50", ph: 6.8, turbidity: 1.6, hardness: 0.8 },
+    { time: "11:00", ph: 7.0, turbidity: 1.4, hardness: 0.7 },
+    { time: "11:10", ph: 7.4, turbidity: 1.0, hardness: 0.2 },
+    { time: "11:20", ph: 7.3, turbidity: 1.1, hardness: 0.1 },
+    { time: "11:30", ph: 7.1, turbidity: 1.2, hardness: 0.6 }
+  ]);
 
   function predictWaterQuality(data) {
     const latest = data[data.length - 1];
@@ -57,32 +47,33 @@ function App() {
 
     setPrediction(`Latest water quality is: ${result}`);
   }
->>>>>>> 5806928707a4e0be66a949069622ca8bc9165d00
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-  
+
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
       complete: (result) => {
-        const raw = result.data.map(row => ({
+        const raw = result.data.map((row, index) => ({
+          time: row.time || `T${index}`, // Add fallback time label
           ph: parseFloat(row.ph),
           turbidity: parseFloat(row.turbidity),
           hardness: parseFloat(row.hardness),
         }));
-  
-        // Normalize hardness using min-max normalization
+
         const hardnessValues = raw.map(r => r.hardness);
         const minHardness = Math.min(...hardnessValues);
         const maxHardness = Math.max(...hardnessValues);
-  
         const normalized = raw.map(r => ({
           ...r,
-          hardness: (r.hardness - minHardness) / (maxHardness - minHardness)
+          hardness:
+            minHardness === maxHardness
+              ? 0.5
+              : (r.hardness - minHardness) / (maxHardness - minHardness),
         }));
-  
+
         setData(normalized);
       },
       error: (err) => {
@@ -90,7 +81,7 @@ function App() {
       }
     });
   };
-  
+
   const renderChart = () => {
     if (!data || data.length === 0) return <p>No data available</p>;
 
@@ -171,13 +162,10 @@ function App() {
           </ScatterChart>
         );
       case "radar":
-        const avgPH = (data.reduce((sum, d) => sum + d.ph, 0) / data.length).toFixed(2);
-        const avgTurb = (data.reduce((sum, d) => sum + d.turbidity, 0) / data.length).toFixed(2);
-        const avgHardness = (data.reduce((sum, d) => sum + d.hardness, 0) / data.length).toFixed(2);
         const radarData = [
-          { metric: "pH", value: Number(avgPH) },
-          { metric: "Turbidity", value: Number(avgTurb) },
-          { metric: "Hardness", value: Number(avgHardness) }
+          { metric: "pH", value: average(data, "ph") },
+          { metric: "Turbidity", value: average(data, "turbidity") },
+          { metric: "Hardness", value: average(data, "hardness") }
         ];
         return (
           <RadarChart cx={240} cy={140} outerRadius={100} width={480} height={280} data={radarData}>
@@ -189,13 +177,10 @@ function App() {
           </RadarChart>
         );
       case "pie":
-        const sumPH = data.reduce((sum, d) => sum + d.ph, 0);
-        const sumTurb = data.reduce((sum, d) => sum + d.turbidity, 0);
-        const sumHardness = data.reduce((sum, d) => sum + d.hardness, 0);
         const pieData = [
-          { name: "Total pH", value: sumPH },
-          { name: "Total Turbidity", value: sumTurb },
-          { name: "Total Hardness", value: sumHardness }
+          { name: "Total pH", value: sum(data, "ph") },
+          { name: "Total Turbidity", value: sum(data, "turbidity") },
+          { name: "Total Hardness", value: sum(data, "hardness") }
         ];
         return (
           <PieChart width={480} height={280}>
@@ -235,18 +220,23 @@ function App() {
     }
   };
 
+  const average = (arr, key) =>
+    Number((arr.reduce((sum, d) => sum + d[key], 0) / arr.length).toFixed(2));
+
+  const sum = (arr, key) =>
+    Number(arr.reduce((total, d) => total + d[key], 0).toFixed(2));
+
   return (
     <div className="app-container">
       <h1>🌊 HydroLens</h1>
 
       <div className="upload-container">
-  <label className="upload-label">Upload Water Quality CSV File</label>
-  <div className="custom-file-input">
-    Choose File
-    <input type="file" accept=".csv" onChange={handleFileUpload} />
-  </div>
-</div>
-
+        <label className="upload-label">Upload Water Quality CSV File</label>
+        <div className="custom-file-input">
+          Choose File
+          <input type="file" accept=".csv" onChange={handleFileUpload} />
+        </div>
+      </div>
 
       <div className="chart-selector">
         <label htmlFor="chartType">Chart Type: </label>
@@ -275,9 +265,10 @@ function App() {
         <div className="card">
           <h2>Prediction</h2>
           <p>Click to simulate a prediction using the latest water sensor data.</p>
-          <button className="predict-button" onClick={() => predictWaterQuality(sampleData)}>Predict Water Quality</button>
+          <button className="predict-button" onClick={() => predictWaterQuality(data)}>
+            Predict Water Quality
+          </button>
           <p className="prediction-result">{prediction}</p>
-
         </div>
       </div>
     </div>
