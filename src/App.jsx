@@ -11,7 +11,12 @@ import {
 } from "recharts";
 import "./App.css";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ff7300"];
+
+
+function App() {
+  const COLORS = ["#8884d8", "#82ca9d", "#ff7300"];
+  const [chartType, setChartType] = useState("line");
+  const [prediction, setPrediction] = useState("");
 
 const sampleData = [
   { time: "10:00", ph: 7.2, turbidity: 1.1, hardness: 0.5 },
@@ -26,8 +31,26 @@ const sampleData = [
   { time: "11:30", ph: 7.1, turbidity: 1.2, hardness: 0.6 }
 ];
 
-function App() {
-  const [chartType, setChartType] = useState("line");
+
+
+  function predictWaterQuality(data) {
+    const latest = data[data.length - 1];
+    const { ph, turbidity, hardness } = latest;
+
+    let score = 0;
+
+    if (ph >= 6.5 && ph <= 8.5) score++;
+    if (turbidity <= 1.5) score++;
+    if (hardness <= 0.7) score++;
+
+    let result = "";
+    if (score === 3) result = "Excellent";
+    else if (score === 2) result = "Good";
+    else if (score === 1) result = "Bad";
+    else result = "Terrible";
+
+    setPrediction(`Latest water quality is: ${result}`);
+  }
 
   const renderChart = () => {
     switch (chartType) {
@@ -202,7 +225,9 @@ function App() {
         <div className="card">
           <h2>Prediction</h2>
           <p>Click to simulate a prediction using the latest water sensor data.</p>
-          <button className="predict-button" onClick={() => alert("Hooked up to AI logic earlier")}>Predict Water Quality</button>
+          <button className="predict-button" onClick={() => predictWaterQuality(sampleData)}>Predict Water Quality</button>
+          <p className="prediction-result">{prediction}</p>
+
         </div>
       </div>
     </div>
