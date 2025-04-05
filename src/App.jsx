@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Papa from "papaparse";
 import {
   LineChart, Line,
   BarChart, Bar,
@@ -13,7 +14,7 @@ import "./App.css";
 
 const COLORS = ["#8884d8", "#82ca9d", "#ff7300"];
 
-const sampleData = [
+const fallbackData = [
   { time: "10:00", ph: 7.2, turbidity: 1.1, hardness: 0.5 },
   { time: "10:10", ph: 6.9, turbidity: 1.5, hardness: 0.3 },
   { time: "10:20", ph: 7.0, turbidity: 1.3, hardness: 0.4 },
@@ -28,12 +29,47 @@ const sampleData = [
 
 function App() {
   const [chartType, setChartType] = useState("line");
+  const [data, setData] = useState(fallbackData);
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => {
+        const raw = result.data.map(row => ({
+          ph: parseFloat(row.ph),
+          turbidity: parseFloat(row.turbidity),
+          hardness: parseFloat(row.hardness),
+        }));
+  
+        // Normalize hardness using min-max normalization
+        const hardnessValues = raw.map(r => r.hardness);
+        const minHardness = Math.min(...hardnessValues);
+        const maxHardness = Math.max(...hardnessValues);
+  
+        const normalized = raw.map(r => ({
+          ...r,
+          hardness: (r.hardness - minHardness) / (maxHardness - minHardness)
+        }));
+  
+        setData(normalized);
+      },
+      error: (err) => {
+        console.error("Error parsing CSV:", err);
+      }
+    });
+  };
+  
   const renderChart = () => {
+    if (!data || data.length === 0) return <p>No data available</p>;
+
     switch (chartType) {
       case "line":
         return (
-          <LineChart width={480} height={280} data={sampleData}>
+          <LineChart width={480} height={280} data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="time" />
             <YAxis domain={[0, 8]} />
@@ -46,7 +82,7 @@ function App() {
         );
       case "bar":
         return (
-          <BarChart width={480} height={280} data={sampleData}>
+          <BarChart width={480} height={280} data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="time" />
             <YAxis />
@@ -59,7 +95,7 @@ function App() {
         );
       case "area":
         return (
-          <AreaChart width={480} height={280} data={sampleData}>
+          <AreaChart width={480} height={280} data={data}>
             <defs>
               <linearGradient id="colorPh" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
@@ -85,7 +121,7 @@ function App() {
         );
       case "composed":
         return (
-          <ComposedChart width={480} height={280} data={sampleData}>
+          <ComposedChart width={480} height={280} data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="time" />
             <YAxis />
@@ -103,13 +139,13 @@ function App() {
             <XAxis type="number" dataKey="ph" name="pH" />
             <YAxis type="number" dataKey="turbidity" name="Turbidity" />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-            <Scatter name="Samples" data={sampleData} fill="#8884d8" />
+            <Scatter name="Samples" data={data} fill="#8884d8" />
           </ScatterChart>
         );
       case "radar":
-        const avgPH = (sampleData.reduce((sum, d) => sum + d.ph, 0) / sampleData.length).toFixed(2);
-        const avgTurb = (sampleData.reduce((sum, d) => sum + d.turbidity, 0) / sampleData.length).toFixed(2);
-        const avgHardness = (sampleData.reduce((sum, d) => sum + d.hardness, 0) / sampleData.length).toFixed(2);
+        const avgPH = (data.reduce((sum, d) => sum + d.ph, 0) / data.length).toFixed(2);
+        const avgTurb = (data.reduce((sum, d) => sum + d.turbidity, 0) / data.length).toFixed(2);
+        const avgHardness = (data.reduce((sum, d) => sum + d.hardness, 0) / data.length).toFixed(2);
         const radarData = [
           { metric: "pH", value: Number(avgPH) },
           { metric: "Turbidity", value: Number(avgTurb) },
@@ -125,9 +161,9 @@ function App() {
           </RadarChart>
         );
       case "pie":
-        const sumPH = sampleData.reduce((sum, d) => sum + d.ph, 0);
-        const sumTurb = sampleData.reduce((sum, d) => sum + d.turbidity, 0);
-        const sumHardness = sampleData.reduce((sum, d) => sum + d.hardness, 0);
+        const sumPH = data.reduce((sum, d) => sum + d.ph, 0);
+        const sumTurb = data.reduce((sum, d) => sum + d.turbidity, 0);
+        const sumHardness = data.reduce((sum, d) => sum + d.hardness, 0);
         const pieData = [
           { name: "Total pH", value: sumPH },
           { name: "Total Turbidity", value: sumTurb },
@@ -154,8 +190,8 @@ function App() {
         );
       case "histogram":
         const histogramData = [
-          { range: "6.5-6.9", count: sampleData.filter(d => d.ph >= 6.5 && d.ph < 7.0).length },
-          { range: "7.0-7.4", count: sampleData.filter(d => d.ph >= 7.0 && d.ph <= 7.4).length },
+          { range: "6.5-6.9", count: data.filter(d => d.ph >= 6.5 && d.ph < 7.0).length },
+          { range: "7.0-7.4", count: data.filter(d => d.ph >= 7.0 && d.ph <= 7.4).length },
         ];
         return (
           <BarChart width={480} height={280} data={histogramData}>
@@ -174,6 +210,15 @@ function App() {
   return (
     <div className="app-container">
       <h1>🌊 HydroLens</h1>
+
+      <div className="upload-container">
+  <label className="upload-label">Upload Water Quality CSV File</label>
+  <div className="custom-file-input">
+    Choose File
+    <input type="file" accept=".csv" onChange={handleFileUpload} />
+  </div>
+</div>
+
 
       <div className="chart-selector">
         <label htmlFor="chartType">Chart Type: </label>
