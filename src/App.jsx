@@ -11,19 +11,19 @@ import {
 } from "recharts";
 import "./App.css";
 
-const COLORS = ["#8884d8", "#82ca9d"];
+const COLORS = ["#8884d8", "#82ca9d", "#ff7300"];
 
 const sampleData = [
-  { time: "10:00", ph: 7.2, turbidity: 1.1 },
-  { time: "10:10", ph: 6.9, turbidity: 1.5 },
-  { time: "10:20", ph: 7.0, turbidity: 1.3 },
-  { time: "10:30", ph: 7.3, turbidity: 1.0 },
-  { time: "10:40", ph: 7.1, turbidity: 1.2 },
-  { time: "10:50", ph: 6.8, turbidity: 1.6 },
-  { time: "11:00", ph: 7.0, turbidity: 1.4 },
-  { time: "11:10", ph: 7.4, turbidity: 1.0 },
-  { time: "11:20", ph: 7.3, turbidity: 1.1 },
-  { time: "11:30", ph: 7.1, turbidity: 1.2 }
+  { time: "10:00", ph: 7.2, turbidity: 1.1, hardness: 0.5 },
+  { time: "10:10", ph: 6.9, turbidity: 1.5, hardness: 0.3 },
+  { time: "10:20", ph: 7.0, turbidity: 1.3, hardness: 0.4 },
+  { time: "10:30", ph: 7.3, turbidity: 1.0, hardness: 0.5 },
+  { time: "10:40", ph: 7.1, turbidity: 1.2, hardness: 0.9 },
+  { time: "10:50", ph: 6.8, turbidity: 1.6, hardness: 0.8 },
+  { time: "11:00", ph: 7.0, turbidity: 1.4, hardness: 0.7 },
+  { time: "11:10", ph: 7.4, turbidity: 1.0, hardness: 0.2 },
+  { time: "11:20", ph: 7.3, turbidity: 1.1, hardness: 0.1 },
+  { time: "11:30", ph: 7.1, turbidity: 1.2, hardness: 0.6 }
 ];
 
 function App() {
@@ -36,11 +36,12 @@ function App() {
           <LineChart width={480} height={280} data={sampleData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="time" />
-            <YAxis domain={[6, 8]} />
+            <YAxis domain={[0, 8]} />
             <Tooltip />
             <Legend />
             <Line type="monotone" dataKey="ph" stroke="#8884d8" />
             <Line type="monotone" dataKey="turbidity" stroke="#82ca9d" />
+            <Line type="monotone" dataKey="hardness" stroke="#ff7300" />
           </LineChart>
         );
       case "bar":
@@ -53,6 +54,7 @@ function App() {
             <Legend />
             <Bar dataKey="ph" fill="#8884d8" />
             <Bar dataKey="turbidity" fill="#82ca9d" />
+            <Bar dataKey="hardness" fill="#ff7300" />
           </BarChart>
         );
       case "area":
@@ -67,6 +69,10 @@ function App() {
                 <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
                 <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
               </linearGradient>
+              <linearGradient id="colorHardness" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#ff7300" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#ff7300" stopOpacity={0} />
+              </linearGradient>
             </defs>
             <XAxis dataKey="time" />
             <YAxis />
@@ -74,6 +80,7 @@ function App() {
             <Tooltip />
             <Area type="monotone" dataKey="ph" stroke="#8884d8" fillOpacity={1} fill="url(#colorPh)" />
             <Area type="monotone" dataKey="turbidity" stroke="#82ca9d" fillOpacity={1} fill="url(#colorTurb)" />
+            <Area type="monotone" dataKey="hardness" stroke="#ff7300" fillOpacity={1} fill="url(#colorHardness)" />
           </AreaChart>
         );
       case "composed":
@@ -86,6 +93,7 @@ function App() {
             <Legend />
             <Bar dataKey="turbidity" barSize={20} fill="#82ca9d" />
             <Line type="monotone" dataKey="ph" stroke="#8884d8" />
+            <Line type="monotone" dataKey="hardness" stroke="#ff7300" />
           </ComposedChart>
         );
       case "scatter":
@@ -101,9 +109,11 @@ function App() {
       case "radar":
         const avgPH = (sampleData.reduce((sum, d) => sum + d.ph, 0) / sampleData.length).toFixed(2);
         const avgTurb = (sampleData.reduce((sum, d) => sum + d.turbidity, 0) / sampleData.length).toFixed(2);
+        const avgHardness = (sampleData.reduce((sum, d) => sum + d.hardness, 0) / sampleData.length).toFixed(2);
         const radarData = [
           { metric: "pH", value: Number(avgPH) },
-          { metric: "Turbidity", value: Number(avgTurb) }
+          { metric: "Turbidity", value: Number(avgTurb) },
+          { metric: "Hardness", value: Number(avgHardness) }
         ];
         return (
           <RadarChart cx={240} cy={140} outerRadius={100} width={480} height={280} data={radarData}>
@@ -117,9 +127,11 @@ function App() {
       case "pie":
         const sumPH = sampleData.reduce((sum, d) => sum + d.ph, 0);
         const sumTurb = sampleData.reduce((sum, d) => sum + d.turbidity, 0);
+        const sumHardness = sampleData.reduce((sum, d) => sum + d.hardness, 0);
         const pieData = [
           { name: "Total pH", value: sumPH },
-          { name: "Total Turbidity", value: sumTurb }
+          { name: "Total Turbidity", value: sumTurb },
+          { name: "Total Hardness", value: sumHardness }
         ];
         return (
           <PieChart width={480} height={280}>
