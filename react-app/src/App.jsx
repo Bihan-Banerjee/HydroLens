@@ -302,15 +302,15 @@ function App() {
           <button className="predict-button" onClick={() => predictWaterQuality(data)}>
             Predict Water Quality
           </button>
-        </div>
-
-        {prediction && (
+          {prediction && (
           <div className={`result-box ${prediction.status.toLowerCase()}`}>
-            <h2>💧 Water Quality Analysis</h2>
-            <p><strong>Status:</strong> {prediction.status}</p>
+            <h2>Water Quality Analysis</h2>
             <p>{prediction.message}</p>
           </div>
         )}
+        </div>
+
+        
 
 {geminiAnalysis && (
   <div className="card-analysis-box">

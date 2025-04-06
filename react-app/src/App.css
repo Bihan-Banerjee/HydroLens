@@ -59,18 +59,23 @@
   width: 100%;
   cursor: pointer;
 }
-  
+
   
   .app-container {
     font-family: sans-serif;
-    padding: 2rem;
     background-image: linear-gradient(45deg, #6b86e8, #3e68ff, #80deea, #2077e1);
     background-size: 200% 200%; 
     background-position: 0% 50%;
     animation: rotateBackground 10s linear infinite; 
     min-height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   @keyframes rotateBackground {
@@ -133,18 +138,7 @@
     color: #333;
   }
 
-  button {
-    background-color: #007acc;
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #005fa3;
-  }
+  
 
   .result {
     margin-top: 1rem;
@@ -209,7 +203,7 @@
     background-color: #007acc;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 500px;
     font-size: 1rem;
     cursor: pointer;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -222,6 +216,24 @@
     transform: translateY(-2px);
     transition: all 0.3s ease;
     scale:1.1;
+  }
+
+  .predict-button{
+    position: relative;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .predict-button:hover {
+    background: linear-gradient(45deg, #0072ff, #00c6ff);
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #00e5ff, 0 0 5px #00e5ff;
   }
 
 
