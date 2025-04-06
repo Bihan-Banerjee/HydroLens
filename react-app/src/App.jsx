@@ -93,7 +93,7 @@ function App() {
     });
   
     try {
-      const response = await fetch("https://hydrolens.onrender.com/", {
+      const response = await fetch("https://hydrolens.onrender.com/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
